@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GitHub Profile Explorer</title>
+
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
   <style>
-    /* === GLOBAL STYLES === */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-      transition: all 0.3s ease-in-out;
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --border-color: #30363d;
+      --text-color: #c9d1d9;
+      --accent-color: #58a6ff;
     }
 
     body {
-      background-color: #0d1117;
-      color: #c9d1d9;
+      font-family: "Poppins", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -25,243 +29,299 @@
       padding: 20px;
     }
 
-    /* === CONTAINER === */
-    #picture {
-      background-color: #161b22;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-      padding: 30px;
-      text-align: center;
-      max-width: 400px;
-      width: 100%;
-      margin-bottom: 30px;
-    }
-
-    /* === INPUT FIELD === */
-    #username {
-      width: 80%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 16px;
-      text-align: center;
-      background-color: #0d1117;
-      color: #c9d1d9;
-      border: 1px solid #30363d;
-    }
-
-    #username:focus {
-      border-color: #58a6ff;
-    }
-
-    /* === BUTTON === */
-    #button1 {
-      background-color: #238636;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 25px;
-      font-size: 16px;
-      cursor: pointer;
+    h1 {
+      color: var(--accent-color);
       margin-bottom: 20px;
+      text-align: center;
     }
 
-    #button1:hover {
-      background-color: #2ea043;
-      transform: scale(1.05);
-    }
-
-    /* === IMAGE === */
-    #sent1 {
-      display: none;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      border: 4px solid #30363d;
-      margin: 20px auto;
-    }
-
-    /* === TEXT === */
-    h2, p {
-      margin: 10px 0;
-      color: #c9d1d9;
-      word-wrap: break-word;
-    }
-
-    /* === REPOSITORY SECTION === */
-    #repoSection {
-      background-color: #161b22;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    #container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
       padding: 25px;
       width: 100%;
       max-width: 800px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     }
 
-    #repoSection h2 {
-      text-align: center;
+    #searchSection {
+      display: flex;
+      justify-content: center;
       margin-bottom: 20px;
-      color: #58a6ff;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .repo-card {
-      background-color: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
-      text-align: left;
+    #username {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: #0d1117;
+      color: var(--text-color);
+      width: 250px;
+      outline: none;
+    }
+
+    #fetchBtn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent-color);
+      color: white;
+      cursor: pointer;
       transition: 0.3s;
     }
 
+    #fetchBtn:hover {
+      background: #1f6feb;
+    }
+
+    #profile {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #profile img {
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 10px;
+      border: 3px solid var(--accent-color);
+    }
+
+    #repoControls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #searchRepo {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: #0d1117;
+      color: var(--text-color);
+      width: 200px;
+    }
+
+    #repoList {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .repo-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 15px;
+      text-align: left;
+      transition: 0.3s;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
     .repo-card:hover {
-      transform: scale(1.02);
-      border-color: #58a6ff;
+      transform: translateY(-5px);
+      border-color: var(--accent-color);
     }
 
     .repo-card a {
-      color: #58a6ff;
+      color: var(--accent-color);
       text-decoration: none;
-      font-weight: bold;
-      font-size: 18px;
+      font-weight: 600;
     }
 
     .repo-info {
       font-size: 14px;
       color: #8b949e;
-      margin-top: 5px;
+      margin-top: 8px;
     }
 
-    /* === RESPONSIVE === */
-    @media (max-width: 480px) {
-      #picture {
-        width: 90%;
-        padding: 20px;
+    #loadMore {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-top: 20px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      transition: 0.3s;
+    }
+
+    #loadMore:hover {
+      background: #1f6feb;
+    }
+
+    #loader {
+      display: none;
+      margin: 20px auto;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--accent-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
       }
-      #repoSection {
-        width: 95%;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
       }
-      #sent1 {
-        width: 120px;
-        height: 120px;
-      }
-      #username {
-        width: 100%;
-      }
-      #button1 {
-        width: 100%;
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
   </style>
 </head>
 
 <body>
-  <!-- Profile Section -->
-  <div id="picture">
-    <input type="text" id="username" placeholder="Enter GitHub Username">
-    <button id="button1">Fetch Profile</button>
+  <h1>GitHub Profile Explorer</h1>
+  <div id="container">
+    <div id="searchSection">
+      <input type="text" id="username" placeholder="Enter GitHub username..." />
+      <button id="fetchBtn">Search</button>
+    </div>
 
-    <img id="sent1" src="" alt="Profile Avatar">
-    <h2 id="followers"></h2>
-    <h2 id="following"></h2>
-    <p id="details"></p>
-  </div>
+    <div id="loader"></div>
 
-  <!-- Repository Section -->
-  <div id="repoSection">
-    <h2>Repositories</h2>
-    <div id="repoList">Enter a username to load repositories...</div>
+    <div id="profile"></div>
+
+    <div id="repoSection">
+      <div id="repoControls" style="display: none;">
+        <input type="text" id="searchRepo" placeholder="Search repositories..." />
+      </div>
+      <div id="repoList"></div>
+      <button id="loadMore" style="display: none;">Load More</button>
+    </div>
   </div>
 
   <script>
-    const button = document.getElementById('button1');
-    const repoList = document.getElementById('repoList');
+    const fetchBtn = document.getElementById("fetchBtn");
+    const usernameInput = document.getElementById("username");
+    const profileDiv = document.getElementById("profile");
+    const repoList = document.getElementById("repoList");
+    const loader = document.getElementById("loader");
+    const searchRepo = document.getElementById("searchRepo");
+    const loadMoreBtn = document.getElementById("loadMore");
+    const repoControls = document.getElementById("repoControls");
 
-    button.addEventListener('click', () => {
-      const username = document.getElementById('username').value.trim();
-      if (username === "") {
-        alert("Please enter a GitHub username!");
-        return;
-      }
+    let allRepos = [];
+    let displayedRepos = 0;
+    const perPage = 10;
 
-      // === USER PROFILE FETCH ===
-      const requestURL = `https://api.github.com/users/${username}`;
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', requestURL);
+    // Show loader
+    function showLoader() {
+      loader.style.display = "block";
+    }
 
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            const data = JSON.parse(this.responseText);
-            console.log(data);
+    // Hide loader
+    function hideLoader() {
+      loader.style.display = "none";
+    }
 
-            const avatar = document.getElementById('sent1');
-            avatar.src = data.avatar_url;
-            avatar.style.display = 'block';
+    // Fetch profile and repos
+    fetchBtn.addEventListener("click", () => {
+      const username = usernameInput.value.trim();
+      if (!username) return alert("Please enter a GitHub username");
 
-            document.getElementById('followers').textContent = `Followers: ${data.followers}`;
-            document.getElementById('following').textContent = `Following: ${data.following}`;
-            document.getElementById('details').innerHTML = `
-              <strong>Name:</strong> ${data.name || "Not Available"} <br>
-              <strong>Bio:</strong> ${data.bio || "No bio provided"} <br>
-              <strong>Public Repos:</strong> ${data.public_repos} <br>
-              <strong>Location:</strong> ${data.location || "Not mentioned"} <br>
-              <strong>Profile:</strong> <a href="${data.html_url}" target="_blank" style="color:#58a6ff;">Visit GitHub</a>
-            `;
+      profileDiv.innerHTML = "";
+      repoList.innerHTML = "";
+      repoControls.style.display = "none";
+      loadMoreBtn.style.display = "none";
+      showLoader();
 
-            // === REPOSITORIES FETCH ===
-            fetchRepos(username);
-          } else {
-            document.getElementById('details').innerHTML = `<span style="color: red;">User not found. Please check the username.</span>`;
-            document.getElementById('sent1').style.display = 'none';
-            document.getElementById('followers').textContent = "";
-            document.getElementById('following').textContent = "";
-            repoList.innerHTML = "";
+      fetch(`https://api.github.com/users/${username}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.message === "Not Found") {
+            alert("User not found!");
+            hideLoader();
+            return;
           }
-        }
-      };
-      xhr.send();
+          displayProfile(data);
+          return fetch(data.repos_url);
+        })
+        .then((res) => res.json())
+        .then((repos) => {
+          allRepos = repos;
+          displayedRepos = 0;
+          showRepos();
+          repoControls.style.display = "flex";
+          loadMoreBtn.style.display = allRepos.length > perPage ? "block" : "none";
+          hideLoader();
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Error fetching data!");
+          hideLoader();
+        });
     });
 
-    // === FUNCTION TO FETCH REPOSITORIES ===
-    function fetchRepos(username) {
-      const repoURL = `https://api.github.com/users/${username}/repos?sort=updated`;
-      const xhrRepos = new XMLHttpRequest();
-      xhrRepos.open('GET', repoURL);
-
-      xhrRepos.onreadystatechange = function () {
-        if (xhrRepos.readyState === 4) {
-          if (xhrRepos.status === 200) {
-            const repos = JSON.parse(this.responseText);
-            if (repos.length === 0) {
-              repoList.innerHTML = "<p>No repositories found.</p>";
-              return;
-            }
-
-            repoList.innerHTML = "";
-            repos.forEach(repo => {
-              const repoCard = document.createElement('div');
-              repoCard.classList.add('repo-card');
-              repoCard.innerHTML = `
-                <a href="${repo.html_url}" target="_blank">${repo.name}</a>
-                <div class="repo-info">
-                  ⭐ Stars: ${repo.stargazers_count} |
-                  🍴 Forks: ${repo.forks_count} |
-                  💻 Language: ${repo.language || "N/A"}
-                </div>
-              `;
-              repoList.appendChild(repoCard);
-            });
-          } else {
-            repoList.innerHTML = "<p style='color:red;'>Unable to fetch repositories.</p>";
-          }
-        }
-      };
-      xhrRepos.send();
+    // Display profile info
+    function displayProfile(data) {
+      profileDiv.innerHTML = `
+        <img src="${data.avatar_url}" alt="Avatar" />
+        <h2>${data.name || data.login}</h2>
+        <p>${data.bio || "No bio available."}</p>
+        <p><i class="fa-solid fa-users"></i> Followers: ${data.followers} | Following: ${data.following}</p>
+      `;
     }
+
+    // Show repos with pagination
+    function showRepos() {
+      const nextRepos = allRepos.slice(displayedRepos, displayedRepos + perPage);
+      nextRepos.forEach((repo) => {
+        const repoCard = document.createElement("div");
+        repoCard.classList.add("repo-card");
+        repoCard.innerHTML = `
+          <a href="${repo.html_url}" target="_blank">${repo.name}</a>
+          <div class="repo-info">
+            ⭐ ${repo.stargazers_count} &nbsp; 🍴 ${repo.forks_count} &nbsp; 💻 ${repo.language || "N/A"}
+          </div>
+        `;
+        repoList.appendChild(repoCard);
+      });
+      displayedRepos += perPage;
+      if (displayedRepos >= allRepos.length) {
+        loadMoreBtn.style.display = "none";
+      }
+    }
+
+    // Load more repos
+    loadMoreBtn.addEventListener("click", showRepos);
+
+    // Search repositories dynamically
+    searchRepo.addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = allRepos.filter((repo) => repo.name.toLowerCase().includes(term));
+      repoList.innerHTML = "";
+      filtered.forEach((repo) => {
+        const repoCard = document.createElement("div");
+        repoCard.classList.add("repo-card");
+        repoCard.innerHTML = `
+          <a href="${repo.html_url}" target="_blank">${repo.name}</a>
+          <div class="repo-info">
+            ⭐ ${repo.stargazers_count} &nbsp; 🍴 ${repo.forks_count} &nbsp; 💻 ${repo.language || "N/A"}
+          </div>
+        `;
+        repoList.appendChild(repoCard);
+      });
+    });
   </script>
 </body>
 </html>
-
