@@ -1,327 +1,347 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GitHub Profile Explorer</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Profile Explorer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- FontAwesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+:root {
+  --bg-color: #0d1117;
+  --card-bg: #161b22;
+  --border-color: #30363d;
+  --text-color: #c9d1d9;
+  --accent-color: #58a6ff;
+}
 
-  <style>
-    :root {
-      --bg-color: #0d1117;
-      --card-bg: #161b22;
-      --border-color: #30363d;
-      --text-color: #c9d1d9;
-      --accent-color: #58a6ff;
-    }
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px;
+  transition: background 0.3s, color 0.3s;
+}
 
-    body {
-      font-family: "Poppins", sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      min-height: 100vh;
-      padding: 20px;
-    }
+body.light-mode {
+  --bg-color: #f5f5f5;
+  --card-bg: #ffffff;
+  --border-color: #cccccc;
+  --text-color: #111111;
+  --accent-color: #007bff;
+}
 
-    h1 {
-      color: var(--accent-color);
-      margin-bottom: 20px;
-      text-align: center;
-    }
+h1 {
+  color: var(--accent-color);
+  margin-bottom: 15px;
+  text-align: center;
+}
 
-    #container {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 25px;
-      width: 100%;
-      max-width: 800px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-    }
+#themeToggle {
+  padding: 8px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent-color);
+  color: #fff;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    #searchSection {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+#themeToggle:hover {
+  background: #1f6feb;
+}
 
-    #username {
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      background: #0d1117;
-      color: var(--text-color);
-      width: 250px;
-      outline: none;
-    }
+#container {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 25px;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
 
-    #fetchBtn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      background: var(--accent-color);
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+#searchSection {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
 
-    #fetchBtn:hover {
-      background: #1f6feb;
-    }
+#username {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  width: 250px;
+  outline: none;
+}
 
-    #profile {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+#fetchBtn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent-color);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    #profile img {
-      border-radius: 50%;
-      width: 120px;
-      height: 120px;
-      margin-bottom: 10px;
-      border: 3px solid var(--accent-color);
-    }
+#fetchBtn:hover {
+  background: #1f6feb;
+}
 
-    #repoControls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+#loader {
+  display: none;
+  margin: 20px auto;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--accent-color);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
 
-    #searchRepo {
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      background: #0d1117;
-      color: var(--text-color);
-      width: 200px;
-    }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-    #repoList {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-    }
+#profile {
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-    .repo-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 15px;
-      text-align: left;
-      transition: 0.3s;
-      animation: fadeIn 0.5s ease forwards;
-    }
+#profile img {
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 10px;
+  border: 3px solid var(--accent-color);
+  transition: transform 0.3s;
+}
 
-    .repo-card:hover {
-      transform: translateY(-5px);
-      border-color: var(--accent-color);
-    }
+#profile img:hover {
+  transform: scale(1.1);
+}
 
-    .repo-card a {
-      color: var(--accent-color);
-      text-decoration: none;
-      font-weight: 600;
-    }
+#repoControls {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
-    .repo-info {
-      font-size: 14px;
-      color: #8b949e;
-      margin-top: 8px;
-    }
+#searchRepo, #sortRepos {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  width: 200px;
+}
 
-    #loadMore {
-      background: var(--accent-color);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      cursor: pointer;
-      margin-top: 20px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      transition: 0.3s;
-    }
+#repoList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+  gap: 15px;
+}
 
-    #loadMore:hover {
-      background: #1f6feb;
-    }
+.repo-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  text-align: left;
+  transition: 0.3s;
+  animation: fadeIn 0.5s ease forwards;
+}
 
-    #loader {
-      display: none;
-      margin: 20px auto;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid var(--accent-color);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
+.repo-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-color);
+}
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
+.repo-card a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+}
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
+.repo-info {
+  font-size: 14px;
+  color: #8b949e;
+  margin-top: 8px;
+}
+
+#loadMore {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin: 20px auto 0 auto;
+  display: block;
+  transition: 0.3s;
+}
+
+#loadMore:hover {
+  background: #1f6feb;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
 </head>
 
 <body>
-  <h1>GitHub Profile Explorer</h1>
-  <div id="container">
-    <div id="searchSection">
-      <input type="text" id="username" placeholder="Enter GitHub username..." />
-      <button id="fetchBtn">Search</button>
-    </div>
-
-    <div id="loader"></div>
-
-    <div id="profile"></div>
-
-    <div id="repoSection">
-      <div id="repoControls" style="display: none;">
-        <input type="text" id="searchRepo" placeholder="Search repositories..." />
-      </div>
-      <div id="repoList"></div>
-      <button id="loadMore" style="display: none;">Load More</button>
-    </div>
+<h1>GitHub Profile Explorer</h1>
+<button id="themeToggle">Toggle Theme</button>
+<div id="container">
+  <div id="searchSection">
+    <input type="text" id="username" placeholder="Enter GitHub username..."/>
+    <button id="fetchBtn">Search</button>
   </div>
 
-  <script>
-    const fetchBtn = document.getElementById("fetchBtn");
-    const usernameInput = document.getElementById("username");
-    const profileDiv = document.getElementById("profile");
-    const repoList = document.getElementById("repoList");
-    const loader = document.getElementById("loader");
-    const searchRepo = document.getElementById("searchRepo");
-    const loadMoreBtn = document.getElementById("loadMore");
-    const repoControls = document.getElementById("repoControls");
+  <div id="loader"></div>
+  <div id="profile"></div>
 
-    let allRepos = [];
-    let displayedRepos = 0;
-    const perPage = 10;
+  <div id="repoSection">
+    <div id="repoControls" style="display:none;">
+      <input type="text" id="searchRepo" placeholder="Search repositories..."/>
+      <select id="sortRepos">
+        <option value="none">Sort by</option>
+        <option value="stars">Stars</option>
+        <option value="forks">Forks</option>
+      </select>
+    </div>
+    <div id="repoList"></div>
+    <button id="loadMore" style="display:none;">Load More</button>
+  </div>
+</div>
 
-    // Show loader
-    function showLoader() {
-      loader.style.display = "block";
-    }
+<script>
+const fetchBtn = document.getElementById("fetchBtn");
+const usernameInput = document.getElementById("username");
+const profileDiv = document.getElementById("profile");
+const repoList = document.getElementById("repoList");
+const loader = document.getElementById("loader");
+const searchRepo = document.getElementById("searchRepo");
+const loadMoreBtn = document.getElementById("loadMore");
+const repoControls = document.getElementById("repoControls");
+const sortRepos = document.getElementById("sortRepos");
+const themeToggle = document.getElementById("themeToggle");
 
-    // Hide loader
-    function hideLoader() {
-      loader.style.display = "none";
-    }
+let allRepos = [];
+let displayedRepos = 0;
+const perPage = 10;
 
-    // Fetch profile and repos
-    fetchBtn.addEventListener("click", () => {
-      const username = usernameInput.value.trim();
-      if (!username) return alert("Please enter a GitHub username");
+// Theme toggle
+themeToggle.addEventListener("click", ()=>document.body.classList.toggle("light-mode"));
 
-      profileDiv.innerHTML = "";
-      repoList.innerHTML = "";
-      repoControls.style.display = "none";
-      loadMoreBtn.style.display = "none";
-      showLoader();
+// Press Enter to search
+usernameInput.addEventListener("keypress",(e)=>{if(e.key==="Enter") fetchBtn.click();});
 
-      fetch(`https://api.github.com/users/${username}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.message === "Not Found") {
-            alert("User not found!");
-            hideLoader();
-            return;
-          }
-          displayProfile(data);
-          return fetch(data.repos_url);
-        })
-        .then((res) => res.json())
-        .then((repos) => {
-          allRepos = repos;
-          displayedRepos = 0;
-          showRepos();
-          repoControls.style.display = "flex";
-          loadMoreBtn.style.display = allRepos.length > perPage ? "block" : "none";
-          hideLoader();
-        })
-        .catch((err) => {
-          console.error(err);
-          alert("Error fetching data!");
-          hideLoader();
-        });
-    });
+// Show/Hide loader
+function showLoader(){loader.style.display="block";}
+function hideLoader(){loader.style.display="none";}
 
-    // Display profile info
-    function displayProfile(data) {
-      profileDiv.innerHTML = `
-        <img src="${data.avatar_url}" alt="Avatar" />
-        <h2>${data.name || data.login}</h2>
-        <p>${data.bio || "No bio available."}</p>
-        <p><i class="fa-solid fa-users"></i> Followers: ${data.followers} | Following: ${data.following}</p>
-      `;
-    }
+// Fetch profile + repos
+fetchBtn.addEventListener("click",()=>{
+  const username = usernameInput.value.trim();
+  if(!username){alert("Enter a GitHub username"); return;}
 
-    // Show repos with pagination
-    function showRepos() {
-      const nextRepos = allRepos.slice(displayedRepos, displayedRepos + perPage);
-      nextRepos.forEach((repo) => {
-        const repoCard = document.createElement("div");
-        repoCard.classList.add("repo-card");
-        repoCard.innerHTML = `
-          <a href="${repo.html_url}" target="_blank">${repo.name}</a>
-          <div class="repo-info">
-            ⭐ ${repo.stargazers_count} &nbsp; 🍴 ${repo.forks_count} &nbsp; 💻 ${repo.language || "N/A"}
-          </div>
-        `;
-        repoList.appendChild(repoCard);
-      });
-      displayedRepos += perPage;
-      if (displayedRepos >= allRepos.length) {
-        loadMoreBtn.style.display = "none";
-      }
-    }
+  profileDiv.innerHTML = "";
+  repoList.innerHTML = "";
+  repoControls.style.display="none";
+  loadMoreBtn.style.display="none";
+  showLoader();
 
-    // Load more repos
-    loadMoreBtn.addEventListener("click", showRepos);
+  fetch(`https://api.github.com/users/${username}`)
+  .then(res=>res.json())
+  .then(user=>{
+    if(user.message){alert("User not found"); hideLoader(); return;}
+    displayProfile(user);
+    return fetch(user.repos_url);
+  })
+  .then(res=>res.json())
+  .then(repos=>{
+    if(!repos) return;
+    allRepos = repos;
+    displayedRepos = 0;
+    showRepos();
+    repoControls.style.display = "flex";
+    loadMoreBtn.style.display = allRepos.length>perPage?"block":"none";
+    hideLoader();
+  })
+  .catch(err=>{console.error(err); alert("Error fetching data!"); hideLoader();});
+});
 
-    // Search repositories dynamically
-    searchRepo.addEventListener("input", (e) => {
-      const term = e.target.value.toLowerCase();
-      const filtered = allRepos.filter((repo) => repo.name.toLowerCase().includes(term));
-      repoList.innerHTML = "";
-      filtered.forEach((repo) => {
-        const repoCard = document.createElement("div");
-        repoCard.classList.add("repo-card");
-        repoCard.innerHTML = `
-          <a href="${repo.html_url}" target="_blank">${repo.name}</a>
-          <div class="repo-info">
-            ⭐ ${repo.stargazers_count} &nbsp; 🍴 ${repo.forks_count} &nbsp; 💻 ${repo.language || "N/A"}
-          </div>
-        `;
-        repoList.appendChild(repoCard);
-      });
-    });
-  </script>
+function displayProfile(user){
+  profileDiv.innerHTML = `
+    <img src="${user.avatar_url}" alt="Avatar"/>
+    <h2>${user.name || user.login}</h2>
+    <p>${user.bio || "No bio available."}</p>
+    <p><i class="fa-solid fa-users"></i> Followers: ${user.followers} | Following: ${user.following}</p>
+    <p><a href="${user.html_url}" target="_blank" style="color: var(--accent-color)">View on GitHub</a></p>
+  `;
+}
+
+// Show repos with pagination
+function showRepos(){
+  showLoader();
+  const nextRepos = allRepos.slice(displayedRepos, displayedRepos+perPage);
+  nextRepos.forEach((repo,index)=>{
+    const div = document.createElement("div");
+    div.classList.add("repo-card");
+    div.style.animationDelay = `${0.1*(displayedRepos+index)}s`;
+    div.innerHTML = `
+      <a href="${repo.html_url}" target="_blank">${repo.name}</a>
+      <div class="repo-info">⭐ ${repo.stargazers_count} &nbsp; 🍴 ${repo.forks_count} &nbsp; 💻 ${repo.language || "N/A"}</div>
+    `;
+    repoList.appendChild(div);
+  });
+  displayedRepos += perPage;
+  if(displayedRepos>=allRepos.length) loadMoreBtn.style.display="none";
+  hideLoader();
+}
+
+loadMoreBtn.addEventListener("click", showRepos);
+
+// Search repositories
+searchRepo.addEventListener("input",(e)=>{
+  const term = e.target.value.toLowerCase();
+  const filtered = allRepos.filter(repo=>repo.name.toLowerCase().includes(term));
+  repoList.innerHTML="";
+  filtered.forEach(repo=>{
+    const div = document.createElement("div");
+    div.classList.add("repo-card");
+    div.innerHTML = `
+      <a href="${repo.html_url}" target="_blank">${repo.name}</a>
+      <div class="repo-info">⭐ ${repo.stargazers_count} &nbsp; 🍴 ${repo.forks_count} &nbsp; 💻 ${repo.language || "N/A"}</div>
+    `;
+    repoList.appendChild(div);
+  });
+});
+
+// Sort repositories
+sortRepos.addEventListener("change",(e)=>{
+  const type = e.target.value;
+  if(type==="stars") allRepos.sort((a,b)=>b.stargazers_count - a.stargazers_count);
+  if(type==="forks") allRepos.sort((a,b)=>b.forks_count - a.forks_count);
+  repoList.innerHTML="";
+  displayedRepos=0;
+  showRepos();
+});
+</script>
 </body>
 </html>
