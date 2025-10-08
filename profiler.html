@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Profile Explorer</title>
+  <style>
+    /* === GLOBAL STYLES === */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease-in-out;
+    }
+
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* === CONTAINER === */
+    #picture {
+      background-color: #161b22;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    /* === INPUT FIELD === */
+    #username {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      text-align: center;
+      background-color: #0d1117;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+    }
+
+    #username:focus {
+      border-color: #58a6ff;
+    }
+
+    /* === BUTTON === */
+    #button1 {
+      background-color: #238636;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    #button1:hover {
+      background-color: #2ea043;
+      transform: scale(1.05);
+    }
+
+    /* === IMAGE === */
+    #sent1 {
+      display: none;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid #30363d;
+      margin: 20px auto;
+    }
+
+    /* === TEXT === */
+    h2, p {
+      margin: 10px 0;
+      color: #c9d1d9;
+      word-wrap: break-word;
+    }
+
+    /* === REPOSITORY SECTION === */
+    #repoSection {
+      background-color: #161b22;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      padding: 25px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    #repoSection h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #58a6ff;
+    }
+
+    .repo-card {
+      background-color: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      text-align: left;
+      transition: 0.3s;
+    }
+
+    .repo-card:hover {
+      transform: scale(1.02);
+      border-color: #58a6ff;
+    }
+
+    .repo-card a {
+      color: #58a6ff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .repo-info {
+      font-size: 14px;
+      color: #8b949e;
+      margin-top: 5px;
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 480px) {
+      #picture {
+        width: 90%;
+        padding: 20px;
+      }
+      #repoSection {
+        width: 95%;
+      }
+      #sent1 {
+        width: 120px;
+        height: 120px;
+      }
+      #username {
+        width: 100%;
+      }
+      #button1 {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Profile Section -->
+  <div id="picture">
+    <input type="text" id="username" placeholder="Enter GitHub Username">
+    <button id="button1">Fetch Profile</button>
+
+    <img id="sent1" src="" alt="Profile Avatar">
+    <h2 id="followers"></h2>
+    <h2 id="following"></h2>
+    <p id="details"></p>
+  </div>
+
+  <!-- Repository Section -->
+  <div id="repoSection">
+    <h2>Repositories</h2>
+    <div id="repoList">Enter a username to load repositories...</div>
+  </div>
+
+  <script>
+    const button = document.getElementById('button1');
+    const repoList = document.getElementById('repoList');
+
+    button.addEventListener('click', () => {
+      const username = document.getElementById('username').value.trim();
+      if (username === "") {
+        alert("Please enter a GitHub username!");
+        return;
+      }
+
+      // === USER PROFILE FETCH ===
+      const requestURL = `https://api.github.com/users/${username}`;
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', requestURL);
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            const data = JSON.parse(this.responseText);
+            console.log(data);
+
+            const avatar = document.getElementById('sent1');
+            avatar.src = data.avatar_url;
+            avatar.style.display = 'block';
+
+            document.getElementById('followers').textContent = `Followers: ${data.followers}`;
+            document.getElementById('following').textContent = `Following: ${data.following}`;
+            document.getElementById('details').innerHTML = `
+              <strong>Name:</strong> ${data.name || "Not Available"} <br>
+              <strong>Bio:</strong> ${data.bio || "No bio provided"} <br>
+              <strong>Public Repos:</strong> ${data.public_repos} <br>
+              <strong>Location:</strong> ${data.location || "Not mentioned"} <br>
+              <strong>Profile:</strong> <a href="${data.html_url}" target="_blank" style="color:#58a6ff;">Visit GitHub</a>
+            `;
+
+            // === REPOSITORIES FETCH ===
+            fetchRepos(username);
+          } else {
+            document.getElementById('details').innerHTML = `<span style="color: red;">User not found. Please check the username.</span>`;
+            document.getElementById('sent1').style.display = 'none';
+            document.getElementById('followers').textContent = "";
+            document.getElementById('following').textContent = "";
+            repoList.innerHTML = "";
+          }
+        }
+      };
+      xhr.send();
+    });
+
+    // === FUNCTION TO FETCH REPOSITORIES ===
+    function fetchRepos(username) {
+      const repoURL = `https://api.github.com/users/${username}/repos?sort=updated`;
+      const xhrRepos = new XMLHttpRequest();
+      xhrRepos.open('GET', repoURL);
+
+      xhrRepos.onreadystatechange = function () {
+        if (xhrRepos.readyState === 4) {
+          if (xhrRepos.status === 200) {
+            const repos = JSON.parse(this.responseText);
+            if (repos.length === 0) {
+              repoList.innerHTML = "<p>No repositories found.</p>";
+              return;
+            }
+
+            repoList.innerHTML = "";
+            repos.forEach(repo => {
+              const repoCard = document.createElement('div');
+              repoCard.classList.add('repo-card');
+              repoCard.innerHTML = `
+                <a href="${repo.html_url}" target="_blank">${repo.name}</a>
+                <div class="repo-info">
+                  ⭐ Stars: ${repo.stargazers_count} |
+                  🍴 Forks: ${repo.forks_count} |
+                  💻 Language: ${repo.language || "N/A"}
+                </div>
+              `;
+              repoList.appendChild(repoCard);
+            });
+          } else {
+            repoList.innerHTML = "<p style='color:red;'>Unable to fetch repositories.</p>";
+          }
+        }
+      };
+      xhrRepos.send();
+    }
+  </script>
+</body>
+</html>
